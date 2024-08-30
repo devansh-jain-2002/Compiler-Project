@@ -1,0 +1,4949 @@
+Terminals unused in grammar
+
+    INTEGER
+    FLOATNUMBER
+    SHORT_STRING
+    LONG_STRING
+    SLASH
+    DOUBLESLASH
+    COLONEQUAL
+    NAME_DUNDER
+    MAIN_DUNDER
+    INIT_DUNDER
+    SPECIAL_CHAR
+    UNDERSCORE
+    DOUBLE_QUOTE
+    SINGLE_QUOTE
+    BACKSLASH
+    SPACE
+    AWAIT
+    IMPORT
+    PASS
+    EXCEPT
+    RAISE
+    FINALLY
+    LAMBDA
+    TRY
+    AS
+    FROM
+    NONLOCAL
+    DEL
+    WITH
+    ASYNC
+    YIELD
+    COMMENT
+    ELLIPSIS
+
+
+Grammar
+
+    0 $accept: module $end
+
+    1 module: file_input
+
+    2 file_input: file_input NEWLINE
+    3           | file_input stmt
+    4           | NEWLINE
+    5           | stmt
+
+    6 funcdef: DEF NAME parameters ARROW test COLON func_body_suite
+    7        | DEF NAME parameters COLON func_body_suite
+
+    8 parameters: LEFTBRACKET typedargslist RIGHTBRACKET
+    9           | LEFTBRACKET RIGHTBRACKET
+
+   10 typedargslist: argument1
+   11              | typedargslist COMMA argument1
+
+   12 argument1: tfpdef
+   13          | tfpdef ASSIGN test
+
+   14 tfpdef: NAME
+   15       | NAME COLON test
+
+   16 stmt: simple_stmt
+   17     | compound_stmt
+
+   18 simple_stmt: small_stmt_help SEMICOLON NEWLINE
+   19            | small_stmt_help NEWLINE
+
+   20 small_stmt_help: small_stmt
+   21                | small_stmt_help SEMICOLON small_stmt
+
+   22 small_stmt: expr_stmt
+   23           | flow_stmt
+   24           | global_stmt
+   25           | assert_stmt
+
+   26 expr_stmt: testlist COLON test
+   27          | testlist COLON test ASSIGN testlist
+   28          | testlist augassign testlist
+   29          | testlist
+   30          | testlist ASSIGN assign_help
+
+   31 assign_help: testlist
+   32            | testlist ASSIGN assign_help
+
+   33 augassign: PLUSEQUAL
+   34          | MINUSEQUAL
+   35          | MULTIPLYEQUAL
+   36          | ATEQUAL
+   37          | DIVIDEEQUAL
+   38          | PERCENTEQUAL
+   39          | ANDEQUAL
+   40          | OREQUAL
+   41          | XOREQUAL
+   42          | LEFTSHIFTEQUAL
+   43          | RIGHTSHIFTEQUAL
+   44          | EXPONENTEQUAL
+   45          | DIVIDEDIVIDEEQUAL
+
+   46 flow_stmt: break_stmt
+   47          | continue_stmt
+   48          | return_stmt
+
+   49 break_stmt: BREAK
+
+   50 continue_stmt: CONTINUE
+
+   51 return_stmt: RETURN testlist
+   52            | RETURN
+
+   53 global_stmt: GLOBAL NAME
+   54            | global_stmt COMMA NAME
+
+   55 assert_stmt: ASSERT test COMMA test
+   56            | ASSERT test
+
+   57 compound_stmt: if_stmt
+   58              | while_stmt
+   59              | for_stmt
+   60              | funcdef
+   61              | classdef
+
+   62 if_stmt: IF test COLON suite if_stmt_help ELSE COLON suite
+   63        | IF test COLON suite if_stmt_help
+   64        | IF test COLON suite ELSE COLON suite
+   65        | IF test COLON suite
+
+   66 if_stmt_help: ELIF test COLON suite
+   67             | ELIF test COLON suite if_stmt_help
+
+   68 while_stmt: WHILE test COLON suite
+   69           | WHILE test COLON suite ELSE COLON suite
+
+   70 for_stmt: FOR exprlist IN testlist COLON suite ELSE COLON suite
+   71         | FOR exprlist IN testlist COLON suite
+
+   72 suite: simple_stmt
+   73      | NEWLINE INDENT stmt_help DEDENT
+
+   74 stmt_help: stmt
+   75          | stmt stmt_help
+
+   76 test: or_test
+   77     | or_test IF or_test ELSE test
+
+   78 or_test: and_test
+   79        | or_test OR and_test
+
+   80 and_test: not_test
+   81         | and_test AND not_test
+
+   82 not_test: NOT not_test
+   83         | comparison
+
+   84 comparison: expr
+   85           | comparison comp_op expr
+
+   86 comp_op: EQUAL
+   87        | LESS
+   88        | GREATER
+   89        | GREATEREQ
+   90        | LESSEQ
+   91        | NOTEQUAL
+   92        | IS
+   93        | IS NOT
+   94        | IN
+   95        | NOT IN
+
+   96 expr: xor_expr
+   97     | expr BITOR xor_expr
+
+   98 xor_expr: and_expr
+   99         | xor_expr BITXOR and_expr
+
+  100 and_expr: shift_expr
+  101         | and_expr AMPERSAND shift_expr
+
+  102 shift_expr: arith_expr
+  103           | shift_expr LEFTSHIFT arith_expr
+  104           | shift_expr RIGHTSHIFT arith_expr
+
+  105 arith_expr: term
+  106           | arith_expr PLUS term
+  107           | arith_expr MINUS term
+
+  108 term: factor
+  109     | term MULTIPLY factor
+  110     | term AT factor
+  111     | term DIVIDE factor
+  112     | term MOD factor
+  113     | term DIVIDEDIVIDE factor
+
+  114 factor: power
+  115       | PLUS factor
+  116       | MINUS factor
+  117       | BITNOT factor
+
+  118 power: atom_expr
+  119      | atom_expr EXP factor
+
+  120 atom_expr: atom
+  121          | atom_expr trailer
+
+  122 atom: LEFTBRACKET testlist RIGHTBRACKET
+  123     | LEFTBRACKET RIGHTBRACKET
+  124     | LEFTSQUAREBRACKET testlist RIGHTSQUAREBRACKET
+  125     | LEFTSQUAREBRACKET RIGHTSQUAREBRACKET
+  126     | LEFTCURLYBRACKET RIGHTCURLYBRACKET
+  127     | NAME
+  128     | NUMBER
+  129     | string_help
+  130     | NONE
+  131     | TRUE
+  132     | FALSE
+
+  133 string_help: string_help STRING
+  134            | STRING
+
+  135 trailer: LEFTBRACKET RIGHTBRACKET
+  136        | LEFTBRACKET arglist RIGHTBRACKET
+  137        | LEFTSQUAREBRACKET test RIGHTSQUAREBRACKET
+  138        | DOT NAME
+
+  139 exprlist: exprlist_help
+  140         | exprlist_help COMMA
+
+  141 exprlist_help: expr
+  142              | exprlist_help COMMA expr
+
+  143 testlist: testlist_list COMMA
+  144         | testlist_list
+
+  145 testlist_list: test
+  146              | testlist_list COMMA test
+
+  147 classdef: CLASS NAME COLON suite
+  148         | CLASS NAME LEFTBRACKET RIGHTBRACKET COLON suite
+  149         | CLASS NAME LEFTBRACKET arglist RIGHTBRACKET COLON suite
+
+  150 arglist: arglist_help
+  151        | arglist_help COMMA
+
+  152 arglist_help: argument
+  153             | arglist_help COMMA argument
+
+  154 func_body_suite: simple_stmt
+  155                | NEWLINE INDENT stmt_help DEDENT
+
+  156 argument: test
+  157         | test ASSIGN test
+  158         | test comp_for
+
+  159 comp_iter: comp_for
+  160          | comp_if
+
+  161 comp_for: FOR exprlist IN or_test
+  162         | FOR exprlist IN or_test comp_iter
+
+  163 comp_if: IF or_test
+  164        | IF or_test comp_iter
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    INTEGER <tok> (258)
+    FLOATNUMBER <tok> (259)
+    NUMBER <tok> (260) 128
+    STRING <tok> (261) 133 134
+    SHORT_STRING <tok> (262)
+    LONG_STRING <tok> (263)
+    PLUS <tok> (264) 106 115
+    MINUS <tok> (265) 107 116
+    MULTIPLY <tok> (266) 109
+    EXP <tok> (267) 119
+    SLASH <tok> (268)
+    DOUBLESLASH <tok> (269)
+    DIVIDE <tok> (270) 111
+    DIVIDEDIVIDE <tok> (271) 113
+    MOD <tok> (272) 112
+    AT <tok> (273) 110
+    RIGHTSHIFT <tok> (274) 104
+    LEFTSHIFT <tok> (275) 103
+    AMPERSAND <tok> (276) 101
+    EQUAL <tok> (277) 86
+    NOTEQUAL <tok> (278) 91
+    GREATER <tok> (279) 88
+    LESS <tok> (280) 87
+    GREATEREQ <tok> (281) 89
+    LESSEQ <tok> (282) 90
+    BITOR <tok> (283) 97
+    BITXOR <tok> (284) 99
+    BITNOT <tok> (285) 117
+    ASSIGN <tok> (286) 13 27 30 32 157
+    PLUSEQUAL <tok> (287) 33
+    MINUSEQUAL <tok> (288) 34
+    MULTIPLYEQUAL <tok> (289) 35
+    DIVIDEEQUAL <tok> (290) 37
+    PERCENTEQUAL <tok> (291) 38
+    EXPONENTEQUAL <tok> (292) 44
+    ANDEQUAL <tok> (293) 39
+    OREQUAL <tok> (294) 40
+    XOREQUAL <tok> (295) 41
+    LEFTSHIFTEQUAL <tok> (296) 42
+    RIGHTSHIFTEQUAL <tok> (297) 43
+    COLONEQUAL <tok> (298)
+    LEFTBRACKET <tok> (299) 8 9 122 123 135 136 148 149
+    RIGHTBRACKET <tok> (300) 8 9 122 123 135 136 148 149
+    LEFTSQUAREBRACKET <tok> (301) 124 125 137
+    RIGHTSQUAREBRACKET <tok> (302) 124 125 137
+    LEFTCURLYBRACKET <tok> (303) 126
+    RIGHTCURLYBRACKET <tok> (304) 126
+    COMMA <tok> (305) 11 54 55 140 142 143 146 151 153
+    COLON <tok> (306) 6 7 15 26 27 62 63 64 65 66 67 68 69 70 71 147 148 149
+    SEMICOLON <tok> (307) 18 21
+    DOT <tok> (308) 138
+    ARROW <tok> (309) 6
+    DIVIDEDIVIDEEQUAL <tok> (310) 45
+    ATEQUAL <tok> (311) 36
+    NAME_DUNDER <tok> (312)
+    MAIN_DUNDER <tok> (313)
+    INIT_DUNDER <tok> (314)
+    SPECIAL_CHAR <tok> (315)
+    UNDERSCORE <tok> (316)
+    DOUBLE_QUOTE <tok> (317)
+    SINGLE_QUOTE <tok> (318)
+    BACKSLASH <tok> (319)
+    SPACE <tok> (320)
+    FALSE <tok> (321) 132
+    AWAIT <tok> (322)
+    ELSE <tok> (323) 62 64 69 70 77
+    IMPORT <tok> (324)
+    PASS <tok> (325)
+    NONE <tok> (326) 130
+    BREAK <tok> (327) 49
+    EXCEPT <tok> (328)
+    IN <tok> (329) 70 71 94 95 161 162
+    RAISE <tok> (330)
+    TRUE <tok> (331) 131
+    CLASS <tok> (332) 147 148 149
+    FINALLY <tok> (333)
+    IS <tok> (334) 92 93
+    RETURN <tok> (335) 51 52
+    AND <tok> (336) 81
+    CONTINUE <tok> (337) 50
+    FOR <tok> (338) 70 71 161 162
+    LAMBDA <tok> (339)
+    TRY <tok> (340)
+    AS <tok> (341)
+    DEF <tok> (342) 6 7
+    FROM <tok> (343)
+    NONLOCAL <tok> (344)
+    WHILE <tok> (345) 68 69
+    ASSERT <tok> (346) 55 56
+    DEL <tok> (347)
+    GLOBAL <tok> (348) 53
+    NOT <tok> (349) 82 93 95
+    WITH <tok> (350)
+    ASYNC <tok> (351)
+    ELIF <tok> (352) 66 67
+    IF <tok> (353) 62 63 64 65 77 163 164
+    OR <tok> (354) 79
+    YIELD <tok> (355)
+    NAME <tok> (356) 6 7 14 15 53 54 127 138 147 148 149
+    COMMENT <tok> (357)
+    NEWLINE <tok> (358) 2 4 18 19 73 155
+    INDENT <tok> (359) 73 155
+    DEDENT <tok> (360) 73 155
+    ELLIPSIS <tok> (361)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (107)
+        on left: 0
+    module <num> (108)
+        on left: 1
+        on right: 0
+    file_input <num> (109)
+        on left: 2 3 4 5
+        on right: 1 2 3
+    funcdef <num> (110)
+        on left: 6 7
+        on right: 60
+    parameters <num> (111)
+        on left: 8 9
+        on right: 6 7
+    typedargslist <num> (112)
+        on left: 10 11
+        on right: 8 11
+    argument1 <num> (113)
+        on left: 12 13
+        on right: 10 11
+    tfpdef <num> (114)
+        on left: 14 15
+        on right: 12 13
+    stmt <num> (115)
+        on left: 16 17
+        on right: 3 5 74 75
+    simple_stmt <num> (116)
+        on left: 18 19
+        on right: 16 72 154
+    small_stmt_help <num> (117)
+        on left: 20 21
+        on right: 18 19 21
+    small_stmt <num> (118)
+        on left: 22 23 24 25
+        on right: 20 21
+    expr_stmt <num> (119)
+        on left: 26 27 28 29 30
+        on right: 22
+    assign_help <num> (120)
+        on left: 31 32
+        on right: 30 32
+    augassign <num> (121)
+        on left: 33 34 35 36 37 38 39 40 41 42 43 44 45
+        on right: 28
+    flow_stmt <num> (122)
+        on left: 46 47 48
+        on right: 23
+    break_stmt <num> (123)
+        on left: 49
+        on right: 46
+    continue_stmt <num> (124)
+        on left: 50
+        on right: 47
+    return_stmt <num> (125)
+        on left: 51 52
+        on right: 48
+    global_stmt <num> (126)
+        on left: 53 54
+        on right: 24 54
+    assert_stmt <num> (127)
+        on left: 55 56
+        on right: 25
+    compound_stmt <num> (128)
+        on left: 57 58 59 60 61
+        on right: 17
+    if_stmt <num> (129)
+        on left: 62 63 64 65
+        on right: 57
+    if_stmt_help <num> (130)
+        on left: 66 67
+        on right: 62 63 67
+    while_stmt <num> (131)
+        on left: 68 69
+        on right: 58
+    for_stmt <num> (132)
+        on left: 70 71
+        on right: 59
+    suite <num> (133)
+        on left: 72 73
+        on right: 62 63 64 65 66 67 68 69 70 71 147 148 149
+    stmt_help <num> (134)
+        on left: 74 75
+        on right: 73 75 155
+    test <num> (135)
+        on left: 76 77
+        on right: 6 13 15 26 27 55 56 62 63 64 65 66 67 68 69 77 137 145 146 156 157 158
+    or_test <num> (136)
+        on left: 78 79
+        on right: 76 77 79 161 162 163 164
+    and_test <num> (137)
+        on left: 80 81
+        on right: 78 79 81
+    not_test <num> (138)
+        on left: 82 83
+        on right: 80 81 82
+    comparison <num> (139)
+        on left: 84 85
+        on right: 83 85
+    comp_op <num> (140)
+        on left: 86 87 88 89 90 91 92 93 94 95
+        on right: 85
+    expr <num> (141)
+        on left: 96 97
+        on right: 84 85 97 141 142
+    xor_expr <num> (142)
+        on left: 98 99
+        on right: 96 97 99
+    and_expr <num> (143)
+        on left: 100 101
+        on right: 98 99 101
+    shift_expr <num> (144)
+        on left: 102 103 104
+        on right: 100 101 103 104
+    arith_expr <num> (145)
+        on left: 105 106 107
+        on right: 102 103 104 106 107
+    term <num> (146)
+        on left: 108 109 110 111 112 113
+        on right: 105 106 107 109 110 111 112 113
+    factor <num> (147)
+        on left: 114 115 116 117
+        on right: 108 109 110 111 112 113 115 116 117 119
+    power <num> (148)
+        on left: 118 119
+        on right: 114
+    atom_expr <num> (149)
+        on left: 120 121
+        on right: 118 119 121
+    atom <num> (150)
+        on left: 122 123 124 125 126 127 128 129 130 131 132
+        on right: 120
+    string_help <num> (151)
+        on left: 133 134
+        on right: 129 133
+    trailer <num> (152)
+        on left: 135 136 137 138
+        on right: 121
+    exprlist <num> (153)
+        on left: 139 140
+        on right: 70 71 161 162
+    exprlist_help <num> (154)
+        on left: 141 142
+        on right: 139 140 142
+    testlist <num> (155)
+        on left: 143 144
+        on right: 26 27 28 29 30 31 32 51 70 71 122 124
+    testlist_list <num> (156)
+        on left: 145 146
+        on right: 143 144 146
+    classdef <num> (157)
+        on left: 147 148 149
+        on right: 61
+    arglist <num> (158)
+        on left: 150 151
+        on right: 136 149
+    arglist_help <num> (159)
+        on left: 152 153
+        on right: 150 151 153
+    func_body_suite <num> (160)
+        on left: 154 155
+        on right: 6 7
+    argument <num> (161)
+        on left: 156 157 158
+        on right: 152 153
+    comp_iter <num> (162)
+        on left: 159 160
+        on right: 162 164
+    comp_for <num> (163)
+        on left: 161 162
+        on right: 158 159
+    comp_if <num> (164)
+        on left: 163 164
+        on right: 160
+
+
+State 0
+
+    0 $accept: • module $end
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    CLASS              shift, and go to state 13
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    FOR                shift, and go to state 16
+    DEF                shift, and go to state 17
+    WHILE              shift, and go to state 18
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    IF                 shift, and go to state 22
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 24
+
+    module           go to state 25
+    file_input       go to state 26
+    funcdef          go to state 27
+    stmt             go to state 28
+    simple_stmt      go to state 29
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    compound_stmt    go to state 39
+    if_stmt          go to state 40
+    while_stmt       go to state 41
+    for_stmt         go to state 42
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    classdef         go to state 61
+
+
+State 1
+
+  128 atom: NUMBER •
+
+    $default  reduce using rule 128 (atom)
+
+
+State 2
+
+  134 string_help: STRING •
+
+    $default  reduce using rule 134 (string_help)
+
+
+State 3
+
+  115 factor: PLUS • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 62
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 4
+
+  116 factor: MINUS • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 63
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 5
+
+  117 factor: BITNOT • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 64
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 6
+
+  122 atom: LEFTBRACKET • testlist RIGHTBRACKET
+  123     | LEFTBRACKET • RIGHTBRACKET
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    RIGHTBRACKET       shift, and go to state 65
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 66
+    testlist_list  go to state 60
+
+
+State 7
+
+  124 atom: LEFTSQUAREBRACKET • testlist RIGHTSQUAREBRACKET
+  125     | LEFTSQUAREBRACKET • RIGHTSQUAREBRACKET
+
+    NUMBER              shift, and go to state 1
+    STRING              shift, and go to state 2
+    PLUS                shift, and go to state 3
+    MINUS               shift, and go to state 4
+    BITNOT              shift, and go to state 5
+    LEFTBRACKET         shift, and go to state 6
+    LEFTSQUAREBRACKET   shift, and go to state 7
+    RIGHTSQUAREBRACKET  shift, and go to state 67
+    LEFTCURLYBRACKET    shift, and go to state 8
+    FALSE               shift, and go to state 9
+    NONE                shift, and go to state 10
+    TRUE                shift, and go to state 12
+    NOT                 shift, and go to state 21
+    NAME                shift, and go to state 23
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 68
+    testlist_list  go to state 60
+
+
+State 8
+
+  126 atom: LEFTCURLYBRACKET • RIGHTCURLYBRACKET
+
+    RIGHTCURLYBRACKET  shift, and go to state 69
+
+
+State 9
+
+  132 atom: FALSE •
+
+    $default  reduce using rule 132 (atom)
+
+
+State 10
+
+  130 atom: NONE •
+
+    $default  reduce using rule 130 (atom)
+
+
+State 11
+
+   49 break_stmt: BREAK •
+
+    $default  reduce using rule 49 (break_stmt)
+
+
+State 12
+
+  131 atom: TRUE •
+
+    $default  reduce using rule 131 (atom)
+
+
+State 13
+
+  147 classdef: CLASS • NAME COLON suite
+  148         | CLASS • NAME LEFTBRACKET RIGHTBRACKET COLON suite
+  149         | CLASS • NAME LEFTBRACKET arglist RIGHTBRACKET COLON suite
+
+    NAME  shift, and go to state 70
+
+
+State 14
+
+   51 return_stmt: RETURN • testlist
+   52            | RETURN •
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    $default  reduce using rule 52 (return_stmt)
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 71
+    testlist_list  go to state 60
+
+
+State 15
+
+   50 continue_stmt: CONTINUE •
+
+    $default  reduce using rule 50 (continue_stmt)
+
+
+State 16
+
+   70 for_stmt: FOR • exprlist IN testlist COLON suite ELSE COLON suite
+   71         | FOR • exprlist IN testlist COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    expr           go to state 72
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    exprlist       go to state 73
+    exprlist_help  go to state 74
+
+
+State 17
+
+    6 funcdef: DEF • NAME parameters ARROW test COLON func_body_suite
+    7        | DEF • NAME parameters COLON func_body_suite
+
+    NAME  shift, and go to state 75
+
+
+State 18
+
+   68 while_stmt: WHILE • test COLON suite
+   69           | WHILE • test COLON suite ELSE COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 76
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 19
+
+   55 assert_stmt: ASSERT • test COMMA test
+   56            | ASSERT • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 77
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 20
+
+   53 global_stmt: GLOBAL • NAME
+
+    NAME  shift, and go to state 78
+
+
+State 21
+
+   82 not_test: NOT • not_test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    not_test     go to state 79
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 22
+
+   62 if_stmt: IF • test COLON suite if_stmt_help ELSE COLON suite
+   63        | IF • test COLON suite if_stmt_help
+   64        | IF • test COLON suite ELSE COLON suite
+   65        | IF • test COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 80
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 23
+
+  127 atom: NAME •
+
+    $default  reduce using rule 127 (atom)
+
+
+State 24
+
+    4 file_input: NEWLINE •
+
+    $default  reduce using rule 4 (file_input)
+
+
+State 25
+
+    0 $accept: module • $end
+
+    $end  shift, and go to state 81
+
+
+State 26
+
+    1 module: file_input •
+    2 file_input: file_input • NEWLINE
+    3           | file_input • stmt
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    CLASS              shift, and go to state 13
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    FOR                shift, and go to state 16
+    DEF                shift, and go to state 17
+    WHILE              shift, and go to state 18
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    IF                 shift, and go to state 22
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 82
+
+    $default  reduce using rule 1 (module)
+
+    funcdef          go to state 27
+    stmt             go to state 83
+    simple_stmt      go to state 29
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    compound_stmt    go to state 39
+    if_stmt          go to state 40
+    while_stmt       go to state 41
+    for_stmt         go to state 42
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    classdef         go to state 61
+
+
+State 27
+
+   60 compound_stmt: funcdef •
+
+    $default  reduce using rule 60 (compound_stmt)
+
+
+State 28
+
+    5 file_input: stmt •
+
+    $default  reduce using rule 5 (file_input)
+
+
+State 29
+
+   16 stmt: simple_stmt •
+
+    $default  reduce using rule 16 (stmt)
+
+
+State 30
+
+   18 simple_stmt: small_stmt_help • SEMICOLON NEWLINE
+   19            | small_stmt_help • NEWLINE
+   21 small_stmt_help: small_stmt_help • SEMICOLON small_stmt
+
+    SEMICOLON  shift, and go to state 84
+    NEWLINE    shift, and go to state 85
+
+
+State 31
+
+   20 small_stmt_help: small_stmt •
+
+    $default  reduce using rule 20 (small_stmt_help)
+
+
+State 32
+
+   22 small_stmt: expr_stmt •
+
+    $default  reduce using rule 22 (small_stmt)
+
+
+State 33
+
+   23 small_stmt: flow_stmt •
+
+    $default  reduce using rule 23 (small_stmt)
+
+
+State 34
+
+   46 flow_stmt: break_stmt •
+
+    $default  reduce using rule 46 (flow_stmt)
+
+
+State 35
+
+   47 flow_stmt: continue_stmt •
+
+    $default  reduce using rule 47 (flow_stmt)
+
+
+State 36
+
+   48 flow_stmt: return_stmt •
+
+    $default  reduce using rule 48 (flow_stmt)
+
+
+State 37
+
+   24 small_stmt: global_stmt •
+   54 global_stmt: global_stmt • COMMA NAME
+
+    COMMA  shift, and go to state 86
+
+    $default  reduce using rule 24 (small_stmt)
+
+
+State 38
+
+   25 small_stmt: assert_stmt •
+
+    $default  reduce using rule 25 (small_stmt)
+
+
+State 39
+
+   17 stmt: compound_stmt •
+
+    $default  reduce using rule 17 (stmt)
+
+
+State 40
+
+   57 compound_stmt: if_stmt •
+
+    $default  reduce using rule 57 (compound_stmt)
+
+
+State 41
+
+   58 compound_stmt: while_stmt •
+
+    $default  reduce using rule 58 (compound_stmt)
+
+
+State 42
+
+   59 compound_stmt: for_stmt •
+
+    $default  reduce using rule 59 (compound_stmt)
+
+
+State 43
+
+  145 testlist_list: test •
+
+    $default  reduce using rule 145 (testlist_list)
+
+
+State 44
+
+   76 test: or_test •
+   77     | or_test • IF or_test ELSE test
+   79 or_test: or_test • OR and_test
+
+    IF  shift, and go to state 87
+    OR  shift, and go to state 88
+
+    $default  reduce using rule 76 (test)
+
+
+State 45
+
+   78 or_test: and_test •
+   81 and_test: and_test • AND not_test
+
+    AND  shift, and go to state 89
+
+    $default  reduce using rule 78 (or_test)
+
+
+State 46
+
+   80 and_test: not_test •
+
+    $default  reduce using rule 80 (and_test)
+
+
+State 47
+
+   83 not_test: comparison •
+   85 comparison: comparison • comp_op expr
+
+    EQUAL      shift, and go to state 90
+    NOTEQUAL   shift, and go to state 91
+    GREATER    shift, and go to state 92
+    LESS       shift, and go to state 93
+    GREATEREQ  shift, and go to state 94
+    LESSEQ     shift, and go to state 95
+    IN         shift, and go to state 96
+    IS         shift, and go to state 97
+    NOT        shift, and go to state 98
+
+    $default  reduce using rule 83 (not_test)
+
+    comp_op  go to state 99
+
+
+State 48
+
+   84 comparison: expr •
+   97 expr: expr • BITOR xor_expr
+
+    BITOR  shift, and go to state 100
+
+    $default  reduce using rule 84 (comparison)
+
+
+State 49
+
+   96 expr: xor_expr •
+   99 xor_expr: xor_expr • BITXOR and_expr
+
+    BITXOR  shift, and go to state 101
+
+    $default  reduce using rule 96 (expr)
+
+
+State 50
+
+   98 xor_expr: and_expr •
+  101 and_expr: and_expr • AMPERSAND shift_expr
+
+    AMPERSAND  shift, and go to state 102
+
+    $default  reduce using rule 98 (xor_expr)
+
+
+State 51
+
+  100 and_expr: shift_expr •
+  103 shift_expr: shift_expr • LEFTSHIFT arith_expr
+  104           | shift_expr • RIGHTSHIFT arith_expr
+
+    RIGHTSHIFT  shift, and go to state 103
+    LEFTSHIFT   shift, and go to state 104
+
+    $default  reduce using rule 100 (and_expr)
+
+
+State 52
+
+  102 shift_expr: arith_expr •
+  106 arith_expr: arith_expr • PLUS term
+  107           | arith_expr • MINUS term
+
+    PLUS   shift, and go to state 105
+    MINUS  shift, and go to state 106
+
+    $default  reduce using rule 102 (shift_expr)
+
+
+State 53
+
+  105 arith_expr: term •
+  109 term: term • MULTIPLY factor
+  110     | term • AT factor
+  111     | term • DIVIDE factor
+  112     | term • MOD factor
+  113     | term • DIVIDEDIVIDE factor
+
+    MULTIPLY      shift, and go to state 107
+    DIVIDE        shift, and go to state 108
+    DIVIDEDIVIDE  shift, and go to state 109
+    MOD           shift, and go to state 110
+    AT            shift, and go to state 111
+
+    $default  reduce using rule 105 (arith_expr)
+
+
+State 54
+
+  108 term: factor •
+
+    $default  reduce using rule 108 (term)
+
+
+State 55
+
+  114 factor: power •
+
+    $default  reduce using rule 114 (factor)
+
+
+State 56
+
+  118 power: atom_expr •
+  119      | atom_expr • EXP factor
+  121 atom_expr: atom_expr • trailer
+
+    EXP                shift, and go to state 112
+    LEFTBRACKET        shift, and go to state 113
+    LEFTSQUAREBRACKET  shift, and go to state 114
+    DOT                shift, and go to state 115
+
+    $default  reduce using rule 118 (power)
+
+    trailer  go to state 116
+
+
+State 57
+
+  120 atom_expr: atom •
+
+    $default  reduce using rule 120 (atom_expr)
+
+
+State 58
+
+  129 atom: string_help •
+  133 string_help: string_help • STRING
+
+    STRING  shift, and go to state 117
+
+    $default  reduce using rule 129 (atom)
+
+
+State 59
+
+   26 expr_stmt: testlist • COLON test
+   27          | testlist • COLON test ASSIGN testlist
+   28          | testlist • augassign testlist
+   29          | testlist •
+   30          | testlist • ASSIGN assign_help
+
+    ASSIGN             shift, and go to state 118
+    PLUSEQUAL          shift, and go to state 119
+    MINUSEQUAL         shift, and go to state 120
+    MULTIPLYEQUAL      shift, and go to state 121
+    DIVIDEEQUAL        shift, and go to state 122
+    PERCENTEQUAL       shift, and go to state 123
+    EXPONENTEQUAL      shift, and go to state 124
+    ANDEQUAL           shift, and go to state 125
+    OREQUAL            shift, and go to state 126
+    XOREQUAL           shift, and go to state 127
+    LEFTSHIFTEQUAL     shift, and go to state 128
+    RIGHTSHIFTEQUAL    shift, and go to state 129
+    COLON              shift, and go to state 130
+    DIVIDEDIVIDEEQUAL  shift, and go to state 131
+    ATEQUAL            shift, and go to state 132
+
+    $default  reduce using rule 29 (expr_stmt)
+
+    augassign  go to state 133
+
+
+State 60
+
+  143 testlist: testlist_list • COMMA
+  144         | testlist_list •
+  146 testlist_list: testlist_list • COMMA test
+
+    COMMA  shift, and go to state 134
+
+    $default  reduce using rule 144 (testlist)
+
+
+State 61
+
+   61 compound_stmt: classdef •
+
+    $default  reduce using rule 61 (compound_stmt)
+
+
+State 62
+
+  115 factor: PLUS factor •
+
+    $default  reduce using rule 115 (factor)
+
+
+State 63
+
+  116 factor: MINUS factor •
+
+    $default  reduce using rule 116 (factor)
+
+
+State 64
+
+  117 factor: BITNOT factor •
+
+    $default  reduce using rule 117 (factor)
+
+
+State 65
+
+  123 atom: LEFTBRACKET RIGHTBRACKET •
+
+    $default  reduce using rule 123 (atom)
+
+
+State 66
+
+  122 atom: LEFTBRACKET testlist • RIGHTBRACKET
+
+    RIGHTBRACKET  shift, and go to state 135
+
+
+State 67
+
+  125 atom: LEFTSQUAREBRACKET RIGHTSQUAREBRACKET •
+
+    $default  reduce using rule 125 (atom)
+
+
+State 68
+
+  124 atom: LEFTSQUAREBRACKET testlist • RIGHTSQUAREBRACKET
+
+    RIGHTSQUAREBRACKET  shift, and go to state 136
+
+
+State 69
+
+  126 atom: LEFTCURLYBRACKET RIGHTCURLYBRACKET •
+
+    $default  reduce using rule 126 (atom)
+
+
+State 70
+
+  147 classdef: CLASS NAME • COLON suite
+  148         | CLASS NAME • LEFTBRACKET RIGHTBRACKET COLON suite
+  149         | CLASS NAME • LEFTBRACKET arglist RIGHTBRACKET COLON suite
+
+    LEFTBRACKET  shift, and go to state 137
+    COLON        shift, and go to state 138
+
+
+State 71
+
+   51 return_stmt: RETURN testlist •
+
+    $default  reduce using rule 51 (return_stmt)
+
+
+State 72
+
+   97 expr: expr • BITOR xor_expr
+  141 exprlist_help: expr •
+
+    BITOR  shift, and go to state 100
+
+    $default  reduce using rule 141 (exprlist_help)
+
+
+State 73
+
+   70 for_stmt: FOR exprlist • IN testlist COLON suite ELSE COLON suite
+   71         | FOR exprlist • IN testlist COLON suite
+
+    IN  shift, and go to state 139
+
+
+State 74
+
+  139 exprlist: exprlist_help •
+  140         | exprlist_help • COMMA
+  142 exprlist_help: exprlist_help • COMMA expr
+
+    COMMA  shift, and go to state 140
+
+    $default  reduce using rule 139 (exprlist)
+
+
+State 75
+
+    6 funcdef: DEF NAME • parameters ARROW test COLON func_body_suite
+    7        | DEF NAME • parameters COLON func_body_suite
+
+    LEFTBRACKET  shift, and go to state 141
+
+    parameters  go to state 142
+
+
+State 76
+
+   68 while_stmt: WHILE test • COLON suite
+   69           | WHILE test • COLON suite ELSE COLON suite
+
+    COLON  shift, and go to state 143
+
+
+State 77
+
+   55 assert_stmt: ASSERT test • COMMA test
+   56            | ASSERT test •
+
+    COMMA  shift, and go to state 144
+
+    $default  reduce using rule 56 (assert_stmt)
+
+
+State 78
+
+   53 global_stmt: GLOBAL NAME •
+
+    $default  reduce using rule 53 (global_stmt)
+
+
+State 79
+
+   82 not_test: NOT not_test •
+
+    $default  reduce using rule 82 (not_test)
+
+
+State 80
+
+   62 if_stmt: IF test • COLON suite if_stmt_help ELSE COLON suite
+   63        | IF test • COLON suite if_stmt_help
+   64        | IF test • COLON suite ELSE COLON suite
+   65        | IF test • COLON suite
+
+    COLON  shift, and go to state 145
+
+
+State 81
+
+    0 $accept: module $end •
+
+    $default  accept
+
+
+State 82
+
+    2 file_input: file_input NEWLINE •
+
+    $default  reduce using rule 2 (file_input)
+
+
+State 83
+
+    3 file_input: file_input stmt •
+
+    $default  reduce using rule 3 (file_input)
+
+
+State 84
+
+   18 simple_stmt: small_stmt_help SEMICOLON • NEWLINE
+   21 small_stmt_help: small_stmt_help SEMICOLON • small_stmt
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 146
+
+    small_stmt     go to state 147
+    expr_stmt      go to state 32
+    flow_stmt      go to state 33
+    break_stmt     go to state 34
+    continue_stmt  go to state 35
+    return_stmt    go to state 36
+    global_stmt    go to state 37
+    assert_stmt    go to state 38
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 59
+    testlist_list  go to state 60
+
+
+State 85
+
+   19 simple_stmt: small_stmt_help NEWLINE •
+
+    $default  reduce using rule 19 (simple_stmt)
+
+
+State 86
+
+   54 global_stmt: global_stmt COMMA • NAME
+
+    NAME  shift, and go to state 148
+
+
+State 87
+
+   77 test: or_test IF • or_test ELSE test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    or_test      go to state 149
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 88
+
+   79 or_test: or_test OR • and_test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    and_test     go to state 150
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 89
+
+   81 and_test: and_test AND • not_test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    not_test     go to state 151
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 90
+
+   86 comp_op: EQUAL •
+
+    $default  reduce using rule 86 (comp_op)
+
+
+State 91
+
+   91 comp_op: NOTEQUAL •
+
+    $default  reduce using rule 91 (comp_op)
+
+
+State 92
+
+   88 comp_op: GREATER •
+
+    $default  reduce using rule 88 (comp_op)
+
+
+State 93
+
+   87 comp_op: LESS •
+
+    $default  reduce using rule 87 (comp_op)
+
+
+State 94
+
+   89 comp_op: GREATEREQ •
+
+    $default  reduce using rule 89 (comp_op)
+
+
+State 95
+
+   90 comp_op: LESSEQ •
+
+    $default  reduce using rule 90 (comp_op)
+
+
+State 96
+
+   94 comp_op: IN •
+
+    $default  reduce using rule 94 (comp_op)
+
+
+State 97
+
+   92 comp_op: IS •
+   93        | IS • NOT
+
+    NOT  shift, and go to state 152
+
+    $default  reduce using rule 92 (comp_op)
+
+
+State 98
+
+   95 comp_op: NOT • IN
+
+    IN  shift, and go to state 153
+
+
+State 99
+
+   85 comparison: comparison comp_op • expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    expr         go to state 154
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 100
+
+   97 expr: expr BITOR • xor_expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    xor_expr     go to state 155
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 101
+
+   99 xor_expr: xor_expr BITXOR • and_expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    and_expr     go to state 156
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 102
+
+  101 and_expr: and_expr AMPERSAND • shift_expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    shift_expr   go to state 157
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 103
+
+  104 shift_expr: shift_expr RIGHTSHIFT • arith_expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    arith_expr   go to state 158
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 104
+
+  103 shift_expr: shift_expr LEFTSHIFT • arith_expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    arith_expr   go to state 159
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 105
+
+  106 arith_expr: arith_expr PLUS • term
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    term         go to state 160
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 106
+
+  107 arith_expr: arith_expr MINUS • term
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    term         go to state 161
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 107
+
+  109 term: term MULTIPLY • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 162
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 108
+
+  111 term: term DIVIDE • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 163
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 109
+
+  113 term: term DIVIDEDIVIDE • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 164
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 110
+
+  112 term: term MOD • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 165
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 111
+
+  110 term: term AT • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 166
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 112
+
+  119 power: atom_expr EXP • factor
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    factor       go to state 167
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 113
+
+  135 trailer: LEFTBRACKET • RIGHTBRACKET
+  136        | LEFTBRACKET • arglist RIGHTBRACKET
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    RIGHTBRACKET       shift, and go to state 168
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test          go to state 169
+    or_test       go to state 44
+    and_test      go to state 45
+    not_test      go to state 46
+    comparison    go to state 47
+    expr          go to state 48
+    xor_expr      go to state 49
+    and_expr      go to state 50
+    shift_expr    go to state 51
+    arith_expr    go to state 52
+    term          go to state 53
+    factor        go to state 54
+    power         go to state 55
+    atom_expr     go to state 56
+    atom          go to state 57
+    string_help   go to state 58
+    arglist       go to state 170
+    arglist_help  go to state 171
+    argument      go to state 172
+
+
+State 114
+
+  137 trailer: LEFTSQUAREBRACKET • test RIGHTSQUAREBRACKET
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 173
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 115
+
+  138 trailer: DOT • NAME
+
+    NAME  shift, and go to state 174
+
+
+State 116
+
+  121 atom_expr: atom_expr trailer •
+
+    $default  reduce using rule 121 (atom_expr)
+
+
+State 117
+
+  133 string_help: string_help STRING •
+
+    $default  reduce using rule 133 (string_help)
+
+
+State 118
+
+   30 expr_stmt: testlist ASSIGN • assign_help
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    assign_help    go to state 175
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 176
+    testlist_list  go to state 60
+
+
+State 119
+
+   33 augassign: PLUSEQUAL •
+
+    $default  reduce using rule 33 (augassign)
+
+
+State 120
+
+   34 augassign: MINUSEQUAL •
+
+    $default  reduce using rule 34 (augassign)
+
+
+State 121
+
+   35 augassign: MULTIPLYEQUAL •
+
+    $default  reduce using rule 35 (augassign)
+
+
+State 122
+
+   37 augassign: DIVIDEEQUAL •
+
+    $default  reduce using rule 37 (augassign)
+
+
+State 123
+
+   38 augassign: PERCENTEQUAL •
+
+    $default  reduce using rule 38 (augassign)
+
+
+State 124
+
+   44 augassign: EXPONENTEQUAL •
+
+    $default  reduce using rule 44 (augassign)
+
+
+State 125
+
+   39 augassign: ANDEQUAL •
+
+    $default  reduce using rule 39 (augassign)
+
+
+State 126
+
+   40 augassign: OREQUAL •
+
+    $default  reduce using rule 40 (augassign)
+
+
+State 127
+
+   41 augassign: XOREQUAL •
+
+    $default  reduce using rule 41 (augassign)
+
+
+State 128
+
+   42 augassign: LEFTSHIFTEQUAL •
+
+    $default  reduce using rule 42 (augassign)
+
+
+State 129
+
+   43 augassign: RIGHTSHIFTEQUAL •
+
+    $default  reduce using rule 43 (augassign)
+
+
+State 130
+
+   26 expr_stmt: testlist COLON • test
+   27          | testlist COLON • test ASSIGN testlist
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 177
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 131
+
+   45 augassign: DIVIDEDIVIDEEQUAL •
+
+    $default  reduce using rule 45 (augassign)
+
+
+State 132
+
+   36 augassign: ATEQUAL •
+
+    $default  reduce using rule 36 (augassign)
+
+
+State 133
+
+   28 expr_stmt: testlist augassign • testlist
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 178
+    testlist_list  go to state 60
+
+
+State 134
+
+  143 testlist: testlist_list COMMA •
+  146 testlist_list: testlist_list COMMA • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    $default  reduce using rule 143 (testlist)
+
+    test         go to state 179
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 135
+
+  122 atom: LEFTBRACKET testlist RIGHTBRACKET •
+
+    $default  reduce using rule 122 (atom)
+
+
+State 136
+
+  124 atom: LEFTSQUAREBRACKET testlist RIGHTSQUAREBRACKET •
+
+    $default  reduce using rule 124 (atom)
+
+
+State 137
+
+  148 classdef: CLASS NAME LEFTBRACKET • RIGHTBRACKET COLON suite
+  149         | CLASS NAME LEFTBRACKET • arglist RIGHTBRACKET COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    RIGHTBRACKET       shift, and go to state 180
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test          go to state 169
+    or_test       go to state 44
+    and_test      go to state 45
+    not_test      go to state 46
+    comparison    go to state 47
+    expr          go to state 48
+    xor_expr      go to state 49
+    and_expr      go to state 50
+    shift_expr    go to state 51
+    arith_expr    go to state 52
+    term          go to state 53
+    factor        go to state 54
+    power         go to state 55
+    atom_expr     go to state 56
+    atom          go to state 57
+    string_help   go to state 58
+    arglist       go to state 181
+    arglist_help  go to state 171
+    argument      go to state 172
+
+
+State 138
+
+  147 classdef: CLASS NAME COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 184
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 139
+
+   70 for_stmt: FOR exprlist IN • testlist COLON suite ELSE COLON suite
+   71         | FOR exprlist IN • testlist COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 185
+    testlist_list  go to state 60
+
+
+State 140
+
+  140 exprlist: exprlist_help COMMA •
+  142 exprlist_help: exprlist_help COMMA • expr
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    $default  reduce using rule 140 (exprlist)
+
+    expr         go to state 186
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 141
+
+    8 parameters: LEFTBRACKET • typedargslist RIGHTBRACKET
+    9           | LEFTBRACKET • RIGHTBRACKET
+
+    RIGHTBRACKET  shift, and go to state 187
+    NAME          shift, and go to state 188
+
+    typedargslist  go to state 189
+    argument1      go to state 190
+    tfpdef         go to state 191
+
+
+State 142
+
+    6 funcdef: DEF NAME parameters • ARROW test COLON func_body_suite
+    7        | DEF NAME parameters • COLON func_body_suite
+
+    COLON  shift, and go to state 192
+    ARROW  shift, and go to state 193
+
+
+State 143
+
+   68 while_stmt: WHILE test COLON • suite
+   69           | WHILE test COLON • suite ELSE COLON suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 194
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 144
+
+   55 assert_stmt: ASSERT test COMMA • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 195
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 145
+
+   62 if_stmt: IF test COLON • suite if_stmt_help ELSE COLON suite
+   63        | IF test COLON • suite if_stmt_help
+   64        | IF test COLON • suite ELSE COLON suite
+   65        | IF test COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 196
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 146
+
+   18 simple_stmt: small_stmt_help SEMICOLON NEWLINE •
+
+    $default  reduce using rule 18 (simple_stmt)
+
+
+State 147
+
+   21 small_stmt_help: small_stmt_help SEMICOLON small_stmt •
+
+    $default  reduce using rule 21 (small_stmt_help)
+
+
+State 148
+
+   54 global_stmt: global_stmt COMMA NAME •
+
+    $default  reduce using rule 54 (global_stmt)
+
+
+State 149
+
+   77 test: or_test IF or_test • ELSE test
+   79 or_test: or_test • OR and_test
+
+    ELSE  shift, and go to state 197
+    OR    shift, and go to state 88
+
+
+State 150
+
+   79 or_test: or_test OR and_test •
+   81 and_test: and_test • AND not_test
+
+    AND  shift, and go to state 89
+
+    $default  reduce using rule 79 (or_test)
+
+
+State 151
+
+   81 and_test: and_test AND not_test •
+
+    $default  reduce using rule 81 (and_test)
+
+
+State 152
+
+   93 comp_op: IS NOT •
+
+    $default  reduce using rule 93 (comp_op)
+
+
+State 153
+
+   95 comp_op: NOT IN •
+
+    $default  reduce using rule 95 (comp_op)
+
+
+State 154
+
+   85 comparison: comparison comp_op expr •
+   97 expr: expr • BITOR xor_expr
+
+    BITOR  shift, and go to state 100
+
+    $default  reduce using rule 85 (comparison)
+
+
+State 155
+
+   97 expr: expr BITOR xor_expr •
+   99 xor_expr: xor_expr • BITXOR and_expr
+
+    BITXOR  shift, and go to state 101
+
+    $default  reduce using rule 97 (expr)
+
+
+State 156
+
+   99 xor_expr: xor_expr BITXOR and_expr •
+  101 and_expr: and_expr • AMPERSAND shift_expr
+
+    AMPERSAND  shift, and go to state 102
+
+    $default  reduce using rule 99 (xor_expr)
+
+
+State 157
+
+  101 and_expr: and_expr AMPERSAND shift_expr •
+  103 shift_expr: shift_expr • LEFTSHIFT arith_expr
+  104           | shift_expr • RIGHTSHIFT arith_expr
+
+    RIGHTSHIFT  shift, and go to state 103
+    LEFTSHIFT   shift, and go to state 104
+
+    $default  reduce using rule 101 (and_expr)
+
+
+State 158
+
+  104 shift_expr: shift_expr RIGHTSHIFT arith_expr •
+  106 arith_expr: arith_expr • PLUS term
+  107           | arith_expr • MINUS term
+
+    PLUS   shift, and go to state 105
+    MINUS  shift, and go to state 106
+
+    $default  reduce using rule 104 (shift_expr)
+
+
+State 159
+
+  103 shift_expr: shift_expr LEFTSHIFT arith_expr •
+  106 arith_expr: arith_expr • PLUS term
+  107           | arith_expr • MINUS term
+
+    PLUS   shift, and go to state 105
+    MINUS  shift, and go to state 106
+
+    $default  reduce using rule 103 (shift_expr)
+
+
+State 160
+
+  106 arith_expr: arith_expr PLUS term •
+  109 term: term • MULTIPLY factor
+  110     | term • AT factor
+  111     | term • DIVIDE factor
+  112     | term • MOD factor
+  113     | term • DIVIDEDIVIDE factor
+
+    MULTIPLY      shift, and go to state 107
+    DIVIDE        shift, and go to state 108
+    DIVIDEDIVIDE  shift, and go to state 109
+    MOD           shift, and go to state 110
+    AT            shift, and go to state 111
+
+    $default  reduce using rule 106 (arith_expr)
+
+
+State 161
+
+  107 arith_expr: arith_expr MINUS term •
+  109 term: term • MULTIPLY factor
+  110     | term • AT factor
+  111     | term • DIVIDE factor
+  112     | term • MOD factor
+  113     | term • DIVIDEDIVIDE factor
+
+    MULTIPLY      shift, and go to state 107
+    DIVIDE        shift, and go to state 108
+    DIVIDEDIVIDE  shift, and go to state 109
+    MOD           shift, and go to state 110
+    AT            shift, and go to state 111
+
+    $default  reduce using rule 107 (arith_expr)
+
+
+State 162
+
+  109 term: term MULTIPLY factor •
+
+    $default  reduce using rule 109 (term)
+
+
+State 163
+
+  111 term: term DIVIDE factor •
+
+    $default  reduce using rule 111 (term)
+
+
+State 164
+
+  113 term: term DIVIDEDIVIDE factor •
+
+    $default  reduce using rule 113 (term)
+
+
+State 165
+
+  112 term: term MOD factor •
+
+    $default  reduce using rule 112 (term)
+
+
+State 166
+
+  110 term: term AT factor •
+
+    $default  reduce using rule 110 (term)
+
+
+State 167
+
+  119 power: atom_expr EXP factor •
+
+    $default  reduce using rule 119 (power)
+
+
+State 168
+
+  135 trailer: LEFTBRACKET RIGHTBRACKET •
+
+    $default  reduce using rule 135 (trailer)
+
+
+State 169
+
+  156 argument: test •
+  157         | test • ASSIGN test
+  158         | test • comp_for
+
+    ASSIGN  shift, and go to state 198
+    FOR     shift, and go to state 199
+
+    $default  reduce using rule 156 (argument)
+
+    comp_for  go to state 200
+
+
+State 170
+
+  136 trailer: LEFTBRACKET arglist • RIGHTBRACKET
+
+    RIGHTBRACKET  shift, and go to state 201
+
+
+State 171
+
+  150 arglist: arglist_help •
+  151        | arglist_help • COMMA
+  153 arglist_help: arglist_help • COMMA argument
+
+    COMMA  shift, and go to state 202
+
+    $default  reduce using rule 150 (arglist)
+
+
+State 172
+
+  152 arglist_help: argument •
+
+    $default  reduce using rule 152 (arglist_help)
+
+
+State 173
+
+  137 trailer: LEFTSQUAREBRACKET test • RIGHTSQUAREBRACKET
+
+    RIGHTSQUAREBRACKET  shift, and go to state 203
+
+
+State 174
+
+  138 trailer: DOT NAME •
+
+    $default  reduce using rule 138 (trailer)
+
+
+State 175
+
+   30 expr_stmt: testlist ASSIGN assign_help •
+
+    $default  reduce using rule 30 (expr_stmt)
+
+
+State 176
+
+   31 assign_help: testlist •
+   32            | testlist • ASSIGN assign_help
+
+    ASSIGN  shift, and go to state 204
+
+    $default  reduce using rule 31 (assign_help)
+
+
+State 177
+
+   26 expr_stmt: testlist COLON test •
+   27          | testlist COLON test • ASSIGN testlist
+
+    ASSIGN  shift, and go to state 205
+
+    $default  reduce using rule 26 (expr_stmt)
+
+
+State 178
+
+   28 expr_stmt: testlist augassign testlist •
+
+    $default  reduce using rule 28 (expr_stmt)
+
+
+State 179
+
+  146 testlist_list: testlist_list COMMA test •
+
+    $default  reduce using rule 146 (testlist_list)
+
+
+State 180
+
+  148 classdef: CLASS NAME LEFTBRACKET RIGHTBRACKET • COLON suite
+
+    COLON  shift, and go to state 206
+
+
+State 181
+
+  149 classdef: CLASS NAME LEFTBRACKET arglist • RIGHTBRACKET COLON suite
+
+    RIGHTBRACKET  shift, and go to state 207
+
+
+State 182
+
+   73 suite: NEWLINE • INDENT stmt_help DEDENT
+
+    INDENT  shift, and go to state 208
+
+
+State 183
+
+   72 suite: simple_stmt •
+
+    $default  reduce using rule 72 (suite)
+
+
+State 184
+
+  147 classdef: CLASS NAME COLON suite •
+
+    $default  reduce using rule 147 (classdef)
+
+
+State 185
+
+   70 for_stmt: FOR exprlist IN testlist • COLON suite ELSE COLON suite
+   71         | FOR exprlist IN testlist • COLON suite
+
+    COLON  shift, and go to state 209
+
+
+State 186
+
+   97 expr: expr • BITOR xor_expr
+  142 exprlist_help: exprlist_help COMMA expr •
+
+    BITOR  shift, and go to state 100
+
+    $default  reduce using rule 142 (exprlist_help)
+
+
+State 187
+
+    9 parameters: LEFTBRACKET RIGHTBRACKET •
+
+    $default  reduce using rule 9 (parameters)
+
+
+State 188
+
+   14 tfpdef: NAME •
+   15       | NAME • COLON test
+
+    COLON  shift, and go to state 210
+
+    $default  reduce using rule 14 (tfpdef)
+
+
+State 189
+
+    8 parameters: LEFTBRACKET typedargslist • RIGHTBRACKET
+   11 typedargslist: typedargslist • COMMA argument1
+
+    RIGHTBRACKET  shift, and go to state 211
+    COMMA         shift, and go to state 212
+
+
+State 190
+
+   10 typedargslist: argument1 •
+
+    $default  reduce using rule 10 (typedargslist)
+
+
+State 191
+
+   12 argument1: tfpdef •
+   13          | tfpdef • ASSIGN test
+
+    ASSIGN  shift, and go to state 213
+
+    $default  reduce using rule 12 (argument1)
+
+
+State 192
+
+    7 funcdef: DEF NAME parameters COLON • func_body_suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 214
+
+    simple_stmt      go to state 215
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    func_body_suite  go to state 216
+
+
+State 193
+
+    6 funcdef: DEF NAME parameters ARROW • test COLON func_body_suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 217
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 194
+
+   68 while_stmt: WHILE test COLON suite •
+   69           | WHILE test COLON suite • ELSE COLON suite
+
+    ELSE  shift, and go to state 218
+
+    $default  reduce using rule 68 (while_stmt)
+
+
+State 195
+
+   55 assert_stmt: ASSERT test COMMA test •
+
+    $default  reduce using rule 55 (assert_stmt)
+
+
+State 196
+
+   62 if_stmt: IF test COLON suite • if_stmt_help ELSE COLON suite
+   63        | IF test COLON suite • if_stmt_help
+   64        | IF test COLON suite • ELSE COLON suite
+   65        | IF test COLON suite •
+
+    ELSE  shift, and go to state 219
+    ELIF  shift, and go to state 220
+
+    $default  reduce using rule 65 (if_stmt)
+
+    if_stmt_help  go to state 221
+
+
+State 197
+
+   77 test: or_test IF or_test ELSE • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 222
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 198
+
+  157 argument: test ASSIGN • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 223
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 199
+
+  161 comp_for: FOR • exprlist IN or_test
+  162         | FOR • exprlist IN or_test comp_iter
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NAME               shift, and go to state 23
+
+    expr           go to state 72
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    exprlist       go to state 224
+    exprlist_help  go to state 74
+
+
+State 200
+
+  158 argument: test comp_for •
+
+    $default  reduce using rule 158 (argument)
+
+
+State 201
+
+  136 trailer: LEFTBRACKET arglist RIGHTBRACKET •
+
+    $default  reduce using rule 136 (trailer)
+
+
+State 202
+
+  151 arglist: arglist_help COMMA •
+  153 arglist_help: arglist_help COMMA • argument
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    $default  reduce using rule 151 (arglist)
+
+    test         go to state 169
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+    argument     go to state 225
+
+
+State 203
+
+  137 trailer: LEFTSQUAREBRACKET test RIGHTSQUAREBRACKET •
+
+    $default  reduce using rule 137 (trailer)
+
+
+State 204
+
+   32 assign_help: testlist ASSIGN • assign_help
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    assign_help    go to state 226
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 176
+    testlist_list  go to state 60
+
+
+State 205
+
+   27 expr_stmt: testlist COLON test ASSIGN • testlist
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test           go to state 43
+    or_test        go to state 44
+    and_test       go to state 45
+    not_test       go to state 46
+    comparison     go to state 47
+    expr           go to state 48
+    xor_expr       go to state 49
+    and_expr       go to state 50
+    shift_expr     go to state 51
+    arith_expr     go to state 52
+    term           go to state 53
+    factor         go to state 54
+    power          go to state 55
+    atom_expr      go to state 56
+    atom           go to state 57
+    string_help    go to state 58
+    testlist       go to state 227
+    testlist_list  go to state 60
+
+
+State 206
+
+  148 classdef: CLASS NAME LEFTBRACKET RIGHTBRACKET COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 228
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 207
+
+  149 classdef: CLASS NAME LEFTBRACKET arglist RIGHTBRACKET • COLON suite
+
+    COLON  shift, and go to state 229
+
+
+State 208
+
+   73 suite: NEWLINE INDENT • stmt_help DEDENT
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    CLASS              shift, and go to state 13
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    FOR                shift, and go to state 16
+    DEF                shift, and go to state 17
+    WHILE              shift, and go to state 18
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    IF                 shift, and go to state 22
+    NAME               shift, and go to state 23
+
+    funcdef          go to state 27
+    stmt             go to state 230
+    simple_stmt      go to state 29
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    compound_stmt    go to state 39
+    if_stmt          go to state 40
+    while_stmt       go to state 41
+    for_stmt         go to state 42
+    stmt_help        go to state 231
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    classdef         go to state 61
+
+
+State 209
+
+   70 for_stmt: FOR exprlist IN testlist COLON • suite ELSE COLON suite
+   71         | FOR exprlist IN testlist COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 232
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 210
+
+   15 tfpdef: NAME COLON • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 233
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 211
+
+    8 parameters: LEFTBRACKET typedargslist RIGHTBRACKET •
+
+    $default  reduce using rule 8 (parameters)
+
+
+State 212
+
+   11 typedargslist: typedargslist COMMA • argument1
+
+    NAME  shift, and go to state 188
+
+    argument1  go to state 234
+    tfpdef     go to state 191
+
+
+State 213
+
+   13 argument1: tfpdef ASSIGN • test
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 235
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 214
+
+  155 func_body_suite: NEWLINE • INDENT stmt_help DEDENT
+
+    INDENT  shift, and go to state 236
+
+
+State 215
+
+  154 func_body_suite: simple_stmt •
+
+    $default  reduce using rule 154 (func_body_suite)
+
+
+State 216
+
+    7 funcdef: DEF NAME parameters COLON func_body_suite •
+
+    $default  reduce using rule 7 (funcdef)
+
+
+State 217
+
+    6 funcdef: DEF NAME parameters ARROW test • COLON func_body_suite
+
+    COLON  shift, and go to state 237
+
+
+State 218
+
+   69 while_stmt: WHILE test COLON suite ELSE • COLON suite
+
+    COLON  shift, and go to state 238
+
+
+State 219
+
+   64 if_stmt: IF test COLON suite ELSE • COLON suite
+
+    COLON  shift, and go to state 239
+
+
+State 220
+
+   66 if_stmt_help: ELIF • test COLON suite
+   67             | ELIF • test COLON suite if_stmt_help
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    test         go to state 240
+    or_test      go to state 44
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 221
+
+   62 if_stmt: IF test COLON suite if_stmt_help • ELSE COLON suite
+   63        | IF test COLON suite if_stmt_help •
+
+    ELSE  shift, and go to state 241
+
+    $default  reduce using rule 63 (if_stmt)
+
+
+State 222
+
+   77 test: or_test IF or_test ELSE test •
+
+    $default  reduce using rule 77 (test)
+
+
+State 223
+
+  157 argument: test ASSIGN test •
+
+    $default  reduce using rule 157 (argument)
+
+
+State 224
+
+  161 comp_for: FOR exprlist • IN or_test
+  162         | FOR exprlist • IN or_test comp_iter
+
+    IN  shift, and go to state 242
+
+
+State 225
+
+  153 arglist_help: arglist_help COMMA argument •
+
+    $default  reduce using rule 153 (arglist_help)
+
+
+State 226
+
+   32 assign_help: testlist ASSIGN assign_help •
+
+    $default  reduce using rule 32 (assign_help)
+
+
+State 227
+
+   27 expr_stmt: testlist COLON test ASSIGN testlist •
+
+    $default  reduce using rule 27 (expr_stmt)
+
+
+State 228
+
+  148 classdef: CLASS NAME LEFTBRACKET RIGHTBRACKET COLON suite •
+
+    $default  reduce using rule 148 (classdef)
+
+
+State 229
+
+  149 classdef: CLASS NAME LEFTBRACKET arglist RIGHTBRACKET COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 243
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 230
+
+   74 stmt_help: stmt •
+   75          | stmt • stmt_help
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    CLASS              shift, and go to state 13
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    FOR                shift, and go to state 16
+    DEF                shift, and go to state 17
+    WHILE              shift, and go to state 18
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    IF                 shift, and go to state 22
+    NAME               shift, and go to state 23
+
+    $default  reduce using rule 74 (stmt_help)
+
+    funcdef          go to state 27
+    stmt             go to state 230
+    simple_stmt      go to state 29
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    compound_stmt    go to state 39
+    if_stmt          go to state 40
+    while_stmt       go to state 41
+    for_stmt         go to state 42
+    stmt_help        go to state 244
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    classdef         go to state 61
+
+
+State 231
+
+   73 suite: NEWLINE INDENT stmt_help • DEDENT
+
+    DEDENT  shift, and go to state 245
+
+
+State 232
+
+   70 for_stmt: FOR exprlist IN testlist COLON suite • ELSE COLON suite
+   71         | FOR exprlist IN testlist COLON suite •
+
+    ELSE  shift, and go to state 246
+
+    $default  reduce using rule 71 (for_stmt)
+
+
+State 233
+
+   15 tfpdef: NAME COLON test •
+
+    $default  reduce using rule 15 (tfpdef)
+
+
+State 234
+
+   11 typedargslist: typedargslist COMMA argument1 •
+
+    $default  reduce using rule 11 (typedargslist)
+
+
+State 235
+
+   13 argument1: tfpdef ASSIGN test •
+
+    $default  reduce using rule 13 (argument1)
+
+
+State 236
+
+  155 func_body_suite: NEWLINE INDENT • stmt_help DEDENT
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    CLASS              shift, and go to state 13
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    FOR                shift, and go to state 16
+    DEF                shift, and go to state 17
+    WHILE              shift, and go to state 18
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    IF                 shift, and go to state 22
+    NAME               shift, and go to state 23
+
+    funcdef          go to state 27
+    stmt             go to state 230
+    simple_stmt      go to state 29
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    compound_stmt    go to state 39
+    if_stmt          go to state 40
+    while_stmt       go to state 41
+    for_stmt         go to state 42
+    stmt_help        go to state 247
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    classdef         go to state 61
+
+
+State 237
+
+    6 funcdef: DEF NAME parameters ARROW test COLON • func_body_suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 214
+
+    simple_stmt      go to state 215
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+    func_body_suite  go to state 248
+
+
+State 238
+
+   69 while_stmt: WHILE test COLON suite ELSE COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 249
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 239
+
+   64 if_stmt: IF test COLON suite ELSE COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 250
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 240
+
+   66 if_stmt_help: ELIF test • COLON suite
+   67             | ELIF test • COLON suite if_stmt_help
+
+    COLON  shift, and go to state 251
+
+
+State 241
+
+   62 if_stmt: IF test COLON suite if_stmt_help ELSE • COLON suite
+
+    COLON  shift, and go to state 252
+
+
+State 242
+
+  161 comp_for: FOR exprlist IN • or_test
+  162         | FOR exprlist IN • or_test comp_iter
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    or_test      go to state 253
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 243
+
+  149 classdef: CLASS NAME LEFTBRACKET arglist RIGHTBRACKET COLON suite •
+
+    $default  reduce using rule 149 (classdef)
+
+
+State 244
+
+   75 stmt_help: stmt stmt_help •
+
+    $default  reduce using rule 75 (stmt_help)
+
+
+State 245
+
+   73 suite: NEWLINE INDENT stmt_help DEDENT •
+
+    $default  reduce using rule 73 (suite)
+
+
+State 246
+
+   70 for_stmt: FOR exprlist IN testlist COLON suite ELSE • COLON suite
+
+    COLON  shift, and go to state 254
+
+
+State 247
+
+  155 func_body_suite: NEWLINE INDENT stmt_help • DEDENT
+
+    DEDENT  shift, and go to state 255
+
+
+State 248
+
+    6 funcdef: DEF NAME parameters ARROW test COLON func_body_suite •
+
+    $default  reduce using rule 6 (funcdef)
+
+
+State 249
+
+   69 while_stmt: WHILE test COLON suite ELSE COLON suite •
+
+    $default  reduce using rule 69 (while_stmt)
+
+
+State 250
+
+   64 if_stmt: IF test COLON suite ELSE COLON suite •
+
+    $default  reduce using rule 64 (if_stmt)
+
+
+State 251
+
+   66 if_stmt_help: ELIF test COLON • suite
+   67             | ELIF test COLON • suite if_stmt_help
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 256
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 252
+
+   62 if_stmt: IF test COLON suite if_stmt_help ELSE COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 257
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 253
+
+   79 or_test: or_test • OR and_test
+  161 comp_for: FOR exprlist IN or_test •
+  162         | FOR exprlist IN or_test • comp_iter
+
+    FOR  shift, and go to state 199
+    IF   shift, and go to state 258
+    OR   shift, and go to state 88
+
+    $default  reduce using rule 161 (comp_for)
+
+    comp_iter  go to state 259
+    comp_for   go to state 260
+    comp_if    go to state 261
+
+
+State 254
+
+   70 for_stmt: FOR exprlist IN testlist COLON suite ELSE COLON • suite
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    BREAK              shift, and go to state 11
+    TRUE               shift, and go to state 12
+    RETURN             shift, and go to state 14
+    CONTINUE           shift, and go to state 15
+    ASSERT             shift, and go to state 19
+    GLOBAL             shift, and go to state 20
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+    NEWLINE            shift, and go to state 182
+
+    simple_stmt      go to state 183
+    small_stmt_help  go to state 30
+    small_stmt       go to state 31
+    expr_stmt        go to state 32
+    flow_stmt        go to state 33
+    break_stmt       go to state 34
+    continue_stmt    go to state 35
+    return_stmt      go to state 36
+    global_stmt      go to state 37
+    assert_stmt      go to state 38
+    suite            go to state 262
+    test             go to state 43
+    or_test          go to state 44
+    and_test         go to state 45
+    not_test         go to state 46
+    comparison       go to state 47
+    expr             go to state 48
+    xor_expr         go to state 49
+    and_expr         go to state 50
+    shift_expr       go to state 51
+    arith_expr       go to state 52
+    term             go to state 53
+    factor           go to state 54
+    power            go to state 55
+    atom_expr        go to state 56
+    atom             go to state 57
+    string_help      go to state 58
+    testlist         go to state 59
+    testlist_list    go to state 60
+
+
+State 255
+
+  155 func_body_suite: NEWLINE INDENT stmt_help DEDENT •
+
+    $default  reduce using rule 155 (func_body_suite)
+
+
+State 256
+
+   66 if_stmt_help: ELIF test COLON suite •
+   67             | ELIF test COLON suite • if_stmt_help
+
+    ELIF  shift, and go to state 220
+
+    $default  reduce using rule 66 (if_stmt_help)
+
+    if_stmt_help  go to state 263
+
+
+State 257
+
+   62 if_stmt: IF test COLON suite if_stmt_help ELSE COLON suite •
+
+    $default  reduce using rule 62 (if_stmt)
+
+
+State 258
+
+  163 comp_if: IF • or_test
+  164        | IF • or_test comp_iter
+
+    NUMBER             shift, and go to state 1
+    STRING             shift, and go to state 2
+    PLUS               shift, and go to state 3
+    MINUS              shift, and go to state 4
+    BITNOT             shift, and go to state 5
+    LEFTBRACKET        shift, and go to state 6
+    LEFTSQUAREBRACKET  shift, and go to state 7
+    LEFTCURLYBRACKET   shift, and go to state 8
+    FALSE              shift, and go to state 9
+    NONE               shift, and go to state 10
+    TRUE               shift, and go to state 12
+    NOT                shift, and go to state 21
+    NAME               shift, and go to state 23
+
+    or_test      go to state 264
+    and_test     go to state 45
+    not_test     go to state 46
+    comparison   go to state 47
+    expr         go to state 48
+    xor_expr     go to state 49
+    and_expr     go to state 50
+    shift_expr   go to state 51
+    arith_expr   go to state 52
+    term         go to state 53
+    factor       go to state 54
+    power        go to state 55
+    atom_expr    go to state 56
+    atom         go to state 57
+    string_help  go to state 58
+
+
+State 259
+
+  162 comp_for: FOR exprlist IN or_test comp_iter •
+
+    $default  reduce using rule 162 (comp_for)
+
+
+State 260
+
+  159 comp_iter: comp_for •
+
+    $default  reduce using rule 159 (comp_iter)
+
+
+State 261
+
+  160 comp_iter: comp_if •
+
+    $default  reduce using rule 160 (comp_iter)
+
+
+State 262
+
+   70 for_stmt: FOR exprlist IN testlist COLON suite ELSE COLON suite •
+
+    $default  reduce using rule 70 (for_stmt)
+
+
+State 263
+
+   67 if_stmt_help: ELIF test COLON suite if_stmt_help •
+
+    $default  reduce using rule 67 (if_stmt_help)
+
+
+State 264
+
+   79 or_test: or_test • OR and_test
+  163 comp_if: IF or_test •
+  164        | IF or_test • comp_iter
+
+    FOR  shift, and go to state 199
+    IF   shift, and go to state 258
+    OR   shift, and go to state 88
+
+    $default  reduce using rule 163 (comp_if)
+
+    comp_iter  go to state 265
+    comp_for   go to state 260
+    comp_if    go to state 261
+
+
+State 265
+
+  164 comp_if: IF or_test comp_iter •
+
+    $default  reduce using rule 164 (comp_if)
